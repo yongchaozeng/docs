@@ -1,6 +1,11 @@
 - JavaScript
-  - [闭包](closure.md)
+  - [DOM](./javascript/dom.md)
+  - [BOM](./javascript/bom.md)
+  - [原型](prototype.md)
+  - [原型](prototype.md)
   - [原型](prototype.md)
 
+- 浏览器
+  - [输入URL后发生的事情](./browse/urlTo.md)
 - CSS
   - [布局](layout.md)

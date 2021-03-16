@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Document</title>
@@ -8,8 +9,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
 </head>
+
 <body>
   <div id="app"></div>
+  <div class="father">
+    <p>1</p>
+    <p id='sun'>123<span>sun1</span><span>sun2</span></p>
+    <p>3</p>
+    <p>4</p>
+  </div>
   <script>
     window.$docsify = {
       name: '',
@@ -19,9 +27,24 @@
       search: 'auto'
     }
   </script>
+
+
+  <script>
+    let i = document.querySelector('#sun')
+    console.log(i.parentNode);                  //父
+    console.log(i.nextElementSibling);          //弟
+    console.log(i.previousElementSibling);      // 兄
+    console.log(i.firstElementChild);           // 长子
+    console.log(i.children);                    // 后代
+    i.onclick=()=>{
+      location.search = "?q=javascript";
+    }
+  </script>
+  
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
 </body>
+
 </html>

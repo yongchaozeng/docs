@@ -1,0 +1,1 @@
+定时器 三种的区别  为什么要用settime for  模拟setInter
