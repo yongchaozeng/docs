@@ -7,5 +7,8 @@
 
 - 浏览器
   - [输入URL后发生的事情](./browse/urlTo.md)
+  - [路由](./browse/router.md)
+- React
+  - [生命周期16.4](./react/lifecycle.md)
 - CSS
   - [布局](layout.md)
