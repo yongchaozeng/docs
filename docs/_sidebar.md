@@ -1,6 +1,7 @@
 - JavaScript
   - [DOM](./javascript/dom.md)
   - [BOM](./javascript/bom.md)
+  - [模块化](./javascript/module.md)
 
 - 浏览器
   - [输入URL后发生的事情](./browse/urlTo.md)
@@ -9,6 +10,10 @@
   - [生命周期16.4](./react/lifecycle.md)
 - Vue
   - [生命周期](./vue/lifecycle.md)
+  - [组件通信](./vue/lifecycle.md)
+  - [双向绑定原理](./vue/lifecycle.md)
+- Nuxt
+  - [原理](./typescript/generics.md)
 - Typescript
   - [泛型](./typescript/generics.md)
 - 网络协议

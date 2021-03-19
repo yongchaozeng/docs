@@ -12,7 +12,7 @@
 
 <body>
   <div id="app"></div>
- 
+
   <script>
     window.$docsify = {
       name: '',
@@ -23,12 +23,47 @@
     }
   </script>
 
- 
-  
+
+
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script>
+
+
+  <script src="https://cdn.bootcss.com/require.js/2.3.6/require.min.js"></script>
+ 
+  <script>
+    // model1.js
+    define('model1',function () {
+      console.log('model1 entry');
+      return {
+        getHello: function () {
+          return 'model1';
+        }
+      };
+    });
+    // model2.js
+    define('model2',function () {
+      console.log('model2 entry');
+      return {
+        getHello: function () {
+          return 'model2';
+        }
+      };
+    });
+    // main.js
+    define('main',function (require) {
+      var model1 = require('./model1');
+      console.log(model1.getHello());
+      var model2 = require('./model2');
+      console.log(model2.getHello());
+    });
+  </script>
+   <script>
+     requirejs(['main']);
+   </script>
+
 </body>
 
 </html>
