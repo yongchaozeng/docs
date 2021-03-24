@@ -8,7 +8,29 @@
     <title>Document</title>
 </head>
 
-<body>
+<body style="width: 100%;height: 900px;border: 1px solid red;">
+    <div id='root'>
+
+    </div>
+    <script>
+        document.body.addEventListener('mousedown', function () {
+            console.log(1, this);
+        })
+        document.body.addEventListener('mousemove', fangdou(function (e) { console.log(2, e, this); }))
+
+        function fangdou(cb) {
+            let timeId = null
+            return function () {
+                let _this = this
+                let ars = arguments
+
+                clearInterval(timeId)
+                timeId = setTimeout(() => {
+                    cb.apply(_this, ars)
+                }, 300)
+            }
+        }
+    </script>
     <script>
         // 手写trim
         String.prototype.myTrim = function () {
@@ -27,16 +49,16 @@
                     // } else {
                     // result = result.concat(item.flat())
                     // }
-                    result = result.concat(isArray(item)?item.flat():item)
+                    result = result.concat(isArray(item) ? item.flat() : item)
                 });
             }
             return result
         }
         Array.prototype.flatReduce = function () {
-            console.log(77,[1,2].concat([1]));
-            
+            console.log(77, [1, 2].concat([1]));
+
             let isArray = array => Object.prototype.toString.call(array) === '[object Array]'
-       
+
             return this.reduce((a, item) => {
                 // console.log(a);
                 if (isArray(item)) {
@@ -47,11 +69,11 @@
                 }
 
 
-            },[])
+            }, [])
 
 
         }
-        console.log([1, 2, 3, [2, 3, 4], [234, [235, { name: '张三' }]]].flat());
+        console.log([1, , , 2, 3, [2, 3, 4], [234, [235, { name: '张三' }]]].flatReduce());
 
 
     </script>
