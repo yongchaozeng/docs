@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // 手写trim
+        String.prototype.myTrim = function () {
+            return this.replace(/^\s+|\s+$/g, '')
+        }
+
+
+        Array.prototype.flat = function () {
+            let isArray = array => Object.prototype.toString.call(array) === '[object Array]'
+            let result = []
+
+            if (isArray(this)) {
+                this.forEach(item => {
+                    // if (!isArray(item)) {
+                    //     result.push(item)
+                    // } else {
+                    // result = result.concat(item.flat())
+                    // }
+                    result = result.concat(isArray(item)?item.flat():item)
+                });
+            }
+            return result
+        }
+        Array.prototype.flatReduce = function () {
+            console.log(77,[1,2].concat([1]));
+            
+            let isArray = array => Object.prototype.toString.call(array) === '[object Array]'
+       
+            return this.reduce((a, item) => {
+                // console.log(a);
+                if (isArray(item)) {
+                    return a.concat(item.flatReduce())
+                } else {
+                    a.push(item)
+                    return a
+                }
+
+
+            },[])
+
+
+        }
+        console.log([1, 2, 3, [2, 3, 4], [234, [235, { name: '张三' }]]].flat());
+
+
+    </script>
+
+</body>
+
+</html>
