@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+
+        function MyPromise(callback) {
+            if (!callback) return
+
+            this.state = 'pending'
+            this.data = null
+            this.resolveCallback = []
+            this.rejectCallback = []
+
+            this.resolve = () => {
+                console.log(this);
+
+                if (this.state === 'pending') {
+                    this.state = 'resolved'
+                    this.resolveCallback.forEach(item => {
+                        item()
+                    });
+                }
+            }
+            this.reject = () => {
+                if (this.state === 'pending') {
+                    this.state = 'rejected'
+                    this.rejectCallback.forEach(item => {
+                        item()
+                    });
+                }
+            }
+            callback(this.resolve, this.reject)
+        }
+
+        MyPromise.prototype.then = function (thenCallback) {
+            return new MyPromise()
+        }
+
+       
+        function Promise(fn) {
+            this.cbs = [];
+
+            const resolve = (value) => {
+                setTimeout(() => {
+                    this.data = value;
+                    this.cbs.forEach((cb) => cb(value));
+                });
+            }
+
+            fn(resolve);
+        }
+
+        Promise.prototype.then = function (onResolved) {
+            return new Promise((resolve) => {
+                this.cbs.push(() => {
+                    const res = onResolved(this.data);
+                    if (res instanceof Promise) {
+                        res.then(resolve);
+                    } else {
+                        resolve(res);
+                    }
+                });
+            });
+        };
+
+         // new MyPromise((resolve, reject) => {
+        //     console.log(999);
+        //     resolve(999)
+        // }).then(() => {
+
+        // })
+
+
+    </script>
+</body>
+
+</html>

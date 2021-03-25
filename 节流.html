@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id='root' style="width: 300px;height: 300px;border: 1px solid red;">
+
+    </div>
+    <script>
+        let root = document.querySelector('#root')
+        root.addEventListener('mousedown', function () {
+            console.log(1, this);
+        })
+        root.addEventListener('mousemove', throttle(function (e) { console.log(2, e, this); }, 2000, true))
+
+        function throttle(func, wait) {
+            let timeId, p = 0, now;
+
+            return function () {
+                let _this = this
+                let args = arguments
+
+                now = +new Date()
+
+                let retime = wait - (now - p)
+
+
+                let waitCallback = function () {
+                    p = +new Date()
+                    timeId = null
+                    func.apply(_this, args)
+                }
+
+                if (retime <= 0 || retime > wait) {
+                    p = now
+
+                    if (timeId) {
+                        clearTimeout(timeId)
+                        timeId = null
+                    }
+                    func.apply(_this, args)
+
+                } else if (!timeId) {
+                    timeId = setTimeout(waitCallback, wait)
+                }
+
+            }
+        }
+        // 节流
+        // function jieliu(fn, wait) {
+        //     let timeId;
+        //     return function () {
+        //         let _this = this
+        //         let args = arguments
+
+        //         if (timeId) return
+
+        //         timeId = setTimeout(() => {
+        //             timeId = null;
+        //             fn.apply(_this, args)
+        //         }, wait)
+
+
+        //     }
+        // }
+    </script>
+</body>
+
+</html>

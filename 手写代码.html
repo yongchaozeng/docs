@@ -8,27 +8,49 @@
     <title>Document</title>
 </head>
 
-<body style="width: 100%;height: 900px;border: 1px solid red;">
-    <div id='root'>
+<body>
+    <div id='root' style="width: 300px;height: 300px;border: 1px solid red;">
 
     </div>
     <script>
-        document.body.addEventListener('mousedown', function () {
+        let root = document.querySelector('#root')
+        root.addEventListener('mousedown', function () {
             console.log(1, this);
         })
-        document.body.addEventListener('mousemove', fangdou(function (e) { console.log(2, e, this); }))
+        root.addEventListener('mousemove', debounce(function (e) { console.log(2, e, this); }, 300, true))
+        // 防抖
+        function debounce(func, wait, immediate) {
 
-        function fangdou(cb) {
-            let timeId = null
-            return function () {
-                let _this = this
-                let ars = arguments
+            var timeout, result;
 
-                clearInterval(timeId)
-                timeId = setTimeout(() => {
-                    cb.apply(_this, ars)
-                }, 300)
+            function debounced() {
+                var context = this;
+                var args = arguments;
+
+                if (timeout) clearTimeout(timeout);
+
+                if (immediate) {
+                    // 如果已经执行过，不再执行
+                    var callNow = !timeout;
+                    timeout = setTimeout(function () {
+                        timeout = null;
+                    }, wait)
+                    if (callNow) result = func.apply(context, args)
+                }
+                else {
+                    timeout = setTimeout(function () {
+                        func.apply(context, args)
+                    }, wait);
+                }
+                return result
+
+
             }
+            debounced.cancel = function () {
+                if (timeout) clearTimeout(timeout);
+                timeout = null
+            }
+            return debounced
         }
     </script>
     <script>

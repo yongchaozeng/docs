@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let a = {
+            name: '张三',
+            age: 12,
+            sun: {
+                name: '小三',
+                age: 10
+            },
+            array: [1, 2, 3, [4, 5]]
+        }
+        a.a = a
+        function deep(object, map = new Map()) {
+            let isArray = param => Object.prototype.toString.call(param) === '[object Array]'
+
+
+            if (typeof object === 'object') {
+                let newValue = isArray(object) ? [] : {};
+
+                if (map.get(object)) {
+                    return object
+                }
+
+                map.set(object, newValue)
+
+                for (let key in object) {
+                    newValue[key] = deep(object[key], map)
+                }
+                return newValue
+            } else {
+                return object
+            }
+
+
+        }
+
+        let b = deep(a)
+
+
+        b.sun.age = 1
+        b.array[3][0] = 'i'
+
+        console.log(a);
+        console.log(b);
+
+
+    </script>
+</body>
+
+</html>
