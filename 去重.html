@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let a = [1, 2, , , 3, 2, , , 5, 4, 5]
+        console.log([...new Set(a)]);
+        function quchong(array) {
+            let result = []
+            for (let index = 0; index < array.length; index++) {
+                if (result.indexOf(array[index]) === -1) {
+                    result.push(array[index])
+                }
+            }
+            return result
+        }
+        function unique(array) {
+            var res = [];
+            for (var i = 0; i < array.length; i++) {
+                var current = array[i];
+                if (res.indexOf(current) === -1) {
+                    res.push(current)
+                }
+            }
+            return res;
+        }
+        console.log(quchong(a));
+
+
+    </script>
+</body>
+
+</html>
