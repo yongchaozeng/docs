@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button onclick="openModal()">弹窗</button>
+    <script>
+
+
+        // let dan = (function () {
+        //     let div
+        //     return function () {
+        //         if (!div) {
+        //             div = document.createElement('div')
+        //             div.innerText = '我是弹窗'
+        //             document.body.appendChild(div)
+        //         }
+        //         return div
+        //     }
+        // })()
+        let dan = (function () {
+            let result
+            return function (fn) {
+                return result || (result = fn.apply(this, arguments))
+            }
+        })()
+        function createDiv() {
+            let div = document.createElement('div')
+            div.innerText = '我是弹窗'
+            document.body.appendChild(div)
+            return div
+        }
+       
+
+        
+        // 单例模式
+        function openModal() {
+            let div = dan(createDiv)
+            div.style.display = div.style.display === 'block' ? 'none' : 'block'
+
+        }
+
+
+
+    </script>
+</body>
+
+</html>
