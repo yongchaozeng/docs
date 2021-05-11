@@ -1,4 +1,6 @@
 - JavaScript
+  - [原型链](./javascript/prototype.md)
+  - [继承](./javascript/extends.md)
   - [DOM](./javascript/dom.md)
   - [BOM](./javascript/bom.md)
   - [模块化](./javascript/module.md)
