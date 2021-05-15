@@ -11,6 +11,7 @@
   - [路由](./browse/router.md)
 - React
   - [生命周期16.4](./react/lifecycle.md)
+  - [渲染流程](./react/reactRender.md)
   - [diff](./react/diff.md)
 - Vue
   - [生命周期](./vue/lifecycle.md)
