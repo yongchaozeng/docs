@@ -1,31 +1,80 @@
----
-theme: channing-cyan
----
-
- 
-  
+- trim
+- 深度拷贝
+- 函数柯里化
 - 大数相加
 - 数组降维
 - 快速排序
-- n以内素数
+- n 以内素数
 - 两数相加
-- 字符串中出现最大的字符 
+- 字符串中出现最大的字符
 - Promise
-- 手写Promise.all
+- 手写 Promise.all
 - useDebounce
 - useThrottle
 - useScroll
 
- ## 大数相加
- > javascript的Number精度有限，最大整数2^53 - 1，超过就不准确，这里可以使用BigInt来计算
+## trim
 
- ```
- // Number
- 9007199254740991+3617264626230116     //12624463880971108
- // BigInt
- 9007199254740991n+3617264626230116n   //12624463880971107n
- ```
->也可以自己封装大数相加，核心思路就是转换为String，在通过0补位让两个数字位数一样，在进行计算
+```
+    function trim(str) {
+        return str.replace(/^\s+|\s+$/g, '')
+    }
+```
+
+## 深度拷贝
+
+```
+ const isObj = (object) => Object.prototype.toString.call(object) === '[object Object]'
+
+  function deepClone(object, map = new WeakMap()) {
+
+      if (object && typeof object === 'object') {
+          let result = isObj(object) ? {} : []
+          if (map.get(object)) return object
+          map.set(object, result)
+
+          for (const key in object) {
+              result[key] = deepClone(object[key], map)
+          }
+
+          return result
+
+      } else {
+
+          return object
+      }
+  }
+```
+
+## 函数柯里化
+
+```
+  const add = a => b => c => a + b + c
+        const add1 = (a, b, c) => a + b + c
+        const curry = (fn, ...args) => {
+            return args.length >= fn.length ?
+                fn(...args) :
+                (..._args) => curry(fn, ...args, ..._args);
+
+        }
+        let add2 = curry(add1)
+        add2(1)(2)(3)
+
+```
+
+## 大数相加
+
+> javascript 的 Number 精度有限，最大整数 2^53 - 1，超过就不准确，这里可以使用 BigInt 来计算
+
+```
+// Number
+9007199254740991+3617264626230116     //12624463880971108
+// BigInt
+9007199254740991n+3617264626230116n   //12624463880971107n
+```
+
+> 也可以自己封装大数相加，核心思路就是转换为 String，在通过 0 补位让两个数字位数一样，在进行计算
+
 ```
 let num1 = 9007199254740991;
 let num2 = 3617264626230116;
@@ -56,7 +105,7 @@ add(num1, num2)
 
 ## 数组降维
 
-> 使用reduce累加，非数组直接concat添加，数组就递归调用
+> 使用 reduce 累加，非数组直接 concat 添加，数组就递归调用
 
 ```
 let array = [1,2,3,[4,[5,{name:'张三'}]]]
@@ -70,11 +119,11 @@ function flat(array) {
 }
 
 flat(array)
-``` 
- 
+```
 
 ## 快速排序
-> 找一个基准值（这里是选的数组中间的数，方便理解），根据基准值分别获取一个大于值的数组left，和一个小于基准值的数组right，两个数组left和right递归执行，当left和right只剩下一项的时候就返回自己本身，最后把值组合起来
+
+> 找一个基准值（这里是选的数组中间的数，方便理解），根据基准值分别获取一个大于值的数组 left，和一个小于基准值的数组 right，两个数组 left 和 right 递归执行，当 left 和 right 只剩下一项的时候就返回自己本身，最后把值组合起来
 
 ```
         function quickSort(arr) {
@@ -85,7 +134,7 @@ flat(array)
             const midValue = midArray[0]
             const left = []
             const right = []
-            
+
             for (let i = 0; i < len; i++) {
                 if (arr[i] >= midValue) {
                     right.push(arr[i])
@@ -97,8 +146,11 @@ flat(array)
             return quickSort(left).concat(midArray, quickSort(right))
         }
 ```
-## n内素数的个数
-> 素数除了1和該数自身外，無法被其他自然数整除的数，被除了1和自身外的数去余不为0就不是素数
+
+## n 内素数的个数
+
+> 素数除了 1 和該数自身外，無法被其他自然数整除的数，被除了 1 和自身外的数去余不为 0 就不是素数
+
 ```
 let countPrimes = function (n: any) {
   let ans: any = 0;
@@ -109,36 +161,40 @@ let countPrimes = function (n: any) {
 };
 
 const isPrime = (x: any) => {
-  for (let i = 2; i * i <= x; ++i) { 
+  for (let i = 2; i * i <= x; ++i) {
     if (x % i == 0) {
       return false;
-    } 
-  } 
+    }
+  }
   return true;
 };
 countPrimes(100) //25
 ```
+
 ## 两数相加
-> 使用对象记录值，key为值，value为index，两个value相加等于目标值时，就返回index
+
+> 使用对象记录值，key 为值，value 为 index，两个 value 相加等于目标值时，就返回 index
+
 ```
 function twoSum (nums, target) {
     let obj = {}
-    
+
     for (let i = 0; i < nums.length; i++) {
         if (obj[nums[i]] == undefined) {
             obj[nums[i]] = i
         }
-        
+
         if (obj[target - nums[i]] !== undefined && obj[target - nums[i]] - i) {
             return [obj[target - nums[i]], i]
         }
     }
-    
+
 };
 twoSum([2, 3, 4, 5, ], 9) // [2,3]
 ```
 
 ## 找出字符串出现次数最多的字符
+
 ```
 function stringSort(str) {
   const obj = {}; // 存储字符串出现次数
@@ -167,6 +223,7 @@ stringSort('dfgdfgaaadffg') // ["f", 4]
 ```
 
 ## Promise
+
 ```
    function MyPromise(executor) {
             this.status = 'pending'
@@ -236,12 +293,11 @@ stringSort('dfgdfgaaadffg') // ["f", 4]
         }
 
 ```
- 
-## Promise.all
- 
->返回的数组排序根据传入的Promise顺序，而不是执行顺序，有一个Promise失败，直接返回reject
 
-  
+## Promise.all
+
+> 返回的数组排序根据传入的 Promise 顺序，而不是执行顺序，有一个 Promise 失败，直接返回 reject
+
 ```
 function promiseAll(array) {
   let count = 0;
@@ -267,7 +323,9 @@ function promiseAll(array) {
 ```
 
 ## usePersistFn
-> 函数持久化，利用useRef的特性可以穿透闭包，获取最新的state，区别于useCallback可以不让子组件刷新的同时获取最新的state
+
+> 函数持久化，利用 useRef 的特性可以穿透闭包，获取最新的 state，区别于 useCallback 可以不让子组件刷新的同时获取最新的 state
+
 ```
 function usePersistFn(fn) {
   const ref = useRef(fn);
@@ -282,7 +340,9 @@ function usePersistFn(fn) {
   return fnRef.current;
 }
 ```
- 栗子
+
+栗子
+
 ```
   const Foo = () => {
     const [num, setNum] = useState(0);
@@ -303,7 +363,7 @@ function usePersistFn(fn) {
       </>
     );
   };
-  
+
   const Bar = React.memo(({ show }) => {
     useEffect(() => {
       console.log('Bar'); // 没有每次add时调用
@@ -322,10 +382,10 @@ function usePersistFn(fn) {
   });
 ```
 
-
-
 ## useDebounce
-> 一个常见的节流，但是在如果在react中使用并修改state，函数重新调用会让timeout不准确，防抖节流就失效了
+
+> 一个常见的节流，但是在如果在 react 中使用并修改 state，函数重新调用会让 timeout 不准确，防抖节流就失效了
+
 ```
 function debounce(func, wait) {
   let timeout;
@@ -336,7 +396,7 @@ function debounce(func, wait) {
 
     if (timeout) clearTimeout(timeout);
 
-    timeout = setTimeout(function () { 
+    timeout = setTimeout(function () {
       func.apply(context, args);
     }, wait);
   };
@@ -375,13 +435,15 @@ function useDebounce(fn, delay) {
 }
 }
 ```
- 栗子
+
+栗子
+
 ```
 const Test = () => {
   const [counter1, setCounter1] = useState(0);
   const [counter2, setCounter2] = useState(0);
 
-  const handleClick = useDebounce(function () { 
+  const handleClick = useDebounce(function () {
     setCounter1(counter1 + 1);
   }, 500);
 
@@ -407,11 +469,14 @@ const Test = () => {
   );
 };
 ```
+
 ## useThrottle
-> 和useDebounce相似
+
+> 和 useDebounce 相似
+
 ```
 function throttle(func, wait) {
-    let timeout; 
+    let timeout;
 
     return function() {
         context = this;
@@ -426,6 +491,7 @@ function throttle(func, wait) {
     }
 }
 ```
+
 ```
 
 function useThrottle(fn, delay ) {
@@ -452,7 +518,9 @@ function useThrottle(fn, delay ) {
 ```
 
 ## useScroll
-> 获取ref或者document的scrollLeft和scrollTop
+
+> 获取 ref 或者 document 的 scrollLeft 和 scrollTop
+
 ```
 const useScroll = (target) => {
   const [position, setPosition] = useState({ left: 0, top: 0 });
@@ -476,11 +544,13 @@ const useScroll = (target) => {
   return position;
 };
 ```
- 栗子
+
+栗子
+
 ```
 
 const Demo = ()=>{
-  const dom = useRef(); 
+  const dom = useRef();
   const position = useScroll(dom);
   return (
     <>
@@ -514,9 +584,3 @@ const Demo = ()=>{
   )
 }
 ```
-
-
-
-
-
-
