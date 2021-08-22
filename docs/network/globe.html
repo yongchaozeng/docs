@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style>
+			body {
+				margin: 0;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+		<script type="module">
+			import * as THREE from "../build/three.module.js";
+			import { OrbitControls } from "./jsm/controls/OrbitControls.js";
+
+			const width = window.innerWidth;
+			const height = window.innerHeight;
+			const aspect = width / height;
+			var s = 500;
+			var k = width / height; //窗口宽高比
+			let angle = 0;
+
+			let scene,
+				camera,
+				renderer,
+				controls,
+				earthMesh,
+				satelliteMesh,
+				textureLoader,
+				light,
+				cloudsMesh;
+			init();
+			animate();
+
+			function init(params) {
+				textureLoader = new THREE.TextureLoader();
+
+				scene = new THREE.Scene();
+
+				scene.background = textureLoader.load("./img/starry_sky_bg.jpg");
+				//left, right, top, bottom, near, far
+				camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, -100, 1500);
+				camera.position.set(100, 100, 100); //设置相机位置
+				camera.lookAt(0, 0, 0); //设置相机方向(指向的场景对象)
+
+				// groupMesh.add(mesh, mesh2);
+				// camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0.4, -0.5);
+				// console.log(-s * k, s * k, s, -s, 1, 1500);
+				// camera.position.set(0, 0, 0); //设置相机位置
+				// camera.lookAt(0, 0, 0); //设置相机方向(指向的场景对象)
+
+				// var earthGeo = new THREE.BoxGeometry(1, 1, 1);
+				// var earthMater = new THREE.MeshPhongMaterial({
+				// 	// color: 0x3f56ff,
+				// 	// map: textureLoader.load("./img/earth.jpg"),
+				// });
+				// earthMesh = new THREE.Mesh(earthGeo, earthMater);
+				// scene.add(earthMesh);
+
+				initLight();
+				initEarth();
+				initSatellite();
+				initClouds();
+				initTrack();
+				initCity();
+				initStar();
+
+				const axesHelper = new THREE.AxesHelper(500);
+				scene.add(axesHelper);
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor(0xb9d3ff, 1); //设置背景颜色
+				renderer.setSize(width, height); //设置渲染区域尺寸
+				document.body.appendChild(renderer.domElement); //body元素中插入canvas对象
+				controls = new OrbitControls(camera, renderer.domElement); //创建控件对象
+			}
+
+			function animate(params) {
+				// 每次执行渲染函数redner时候，角度累加0.005
+				angle += 0.005;
+				// 圆周运动网格模型x坐标计算  绕转半径400
+				var x = 247 * Math.sin(angle);
+				// 圆周运动网格模型y坐标计算  绕转半径400
+				var y = 247 * Math.cos(angle);
+				if (satelliteMesh) {
+					// 每次执行render函数，更新需要做圆周运动网格模型Mesh的位置属性
+					satelliteMesh.position.set(x, y, 0);
+				}
+
+				controls.update();
+				if (earthMesh) {
+					// earthMesh.rotation.y -= 0.0002;
+				}
+				// 地球自转
+
+				if (cloudsMesh) {
+					// // 漂浮的云层
+					cloudsMesh.rotation.y -= 0.0005;
+					cloudsMesh.rotation.z += 0.0005;
+				}
+
+				renderer.render(scene, camera);
+				requestAnimationFrame(animate);
+
+				// requestAnimationFrame(animate);
+			}
+			function initLight() {
+				// A light source positioned directly above the scene, with color fading from the sky color to the ground color.
+				// 位于场景正上方的光源，颜色从天空颜色渐变为地面颜色。
+				//  var light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+				// scene.add(light);
+
+				// const point = new THREE.PointLight(0xffffff);
+				// point.position.set(10, 200, 300);
+				// scene.add(point);
+
+				// 环境光
+				light = new THREE.AmbientLight(0xffffff);
+				light.position.set(100, 100, 200);
+				scene.add(light);
+
+				// 平行光
+				// 位置不同，方向光作用于物体的面也不同，看到的物体各个面的颜色也不一样
+				// light = new THREE.DirectionalLight(0xffffbb, 1);
+				// light.position.set(-1, 1, 1);
+				// scene.add(light);
+			}
+			function initEarth() {
+				var earthGeo = new THREE.SphereGeometry(200, 100, 100);
+				var earthMater = new THREE.MeshPhongMaterial({
+					// color: 0x3f56ff,
+					map: textureLoader.load("./img/earth.jpg"),
+				});
+				earthMesh = new THREE.Mesh(earthGeo, earthMater);
+				scene.add(earthMesh);
+			}
+			function initSatellite() {
+				var earthGeo = new THREE.SphereGeometry(10, 10, 10);
+				var earthMater = new THREE.MeshPhongMaterial({
+					color: 0xff944d,
+					// map: textureLoader.load("./img/earth.jpg"),
+				});
+				satelliteMesh = new THREE.Mesh(earthGeo, earthMater);
+				satelliteMesh.position.set(247, 0, 0);
+				scene.add(satelliteMesh);
+			}
+			function initClouds() {
+				// 实例化一个球体，半径要比地球的大一点，从而实现云飘咋地球上的感觉
+				var cloudsGeo = new THREE.SphereGeometry(201, 100, 100);
+
+				// transparent 与 opacity 搭配使用，设置材质的透明度，当 transparent 设为 true 时， 会对材质特殊处理，对性能会有些损耗。
+				var cloudsMater = new THREE.MeshPhongMaterial({
+					alphaMap: new THREE.TextureLoader().load("./img/clouds.jpg"),
+					transparent: true,
+					opacity: 0.2,
+				});
+
+				cloudsMesh = new THREE.Mesh(cloudsGeo, cloudsMater);
+				scene.add(cloudsMesh);
+			}
+
+			function initTrack(params) {
+				const geometry = new THREE.RingGeometry(249, 250, 64, 1);
+				const material = new THREE.MeshPhongMaterial({
+					color: 0x333333,
+					side: THREE.DoubleSide,
+					transparent: true,
+					opacity: 0.6,
+				});
+				const mesh = new THREE.Mesh(geometry, material);
+				scene.add(mesh);
+			}
+			function initCity() {
+				let group = new THREE.Group();
+				const r = 8;
+				let shapePoint = new THREE.Shape();
+				shapePoint.absarc(0, 0, r - 4, 0, 2 * Math.PI, false);
+				let arcGeometry = new THREE.ShapeGeometry(shapePoint);
+				let arcMaterial = new THREE.MeshBasicMaterial({
+					color: 0x008080,
+					side: THREE.DoubleSide,
+				});
+				let point = new THREE.Mesh(arcGeometry, arcMaterial);
+				group.add(point);
+
+				let geometryLine = new THREE.Geometry();
+				let arc = new THREE.ArcCurve(0, 0, r, 0, 2 * Math.PI);
+				let points = arc.getPoints(40);
+				geometryLine.setFromPoints(points);
+				let LineMateri = new THREE.LineBasicMaterial({ color: 0x20b2aa });
+				let line = new THREE.Line(geometryLine, LineMateri);
+				let { x, y, z } = getPosition(116.407394, 39.904211, 202);
+				group.position.set(x, y, z);
+
+				var plane = new THREE.PlaneGeometry(20, 60);
+				var material = new THREE.MeshPhongMaterial({
+					color: 0xffffff,
+					//设置矩形网格模型的纹理贴图(光柱特效、树或草等你想要表达效果对应背景透明纹理贴图)
+					map: textureLoader.load("./img/beam.png"),
+					// 双面显示
+					side: THREE.DoubleSide,
+					// 开启透明效果，否则颜色贴图map的透明不起作用
+					transparent: true,
+					opacity: 0.9,
+				});
+				var mesh = new THREE.Mesh(plane, material);
+				var mesh2 = mesh.clone().rotateY(Math.PI / 2);
+				// mesh.position.set(x, y, z);
+				// mesh2.position.set(x, y, z);
+				// var groupMesh = new THREE.Group();
+				scene.add(mesh);
+				// scene.add(mesh2);
+
+				group.add(line);
+				group.add(mesh);
+				group.add(mesh2);
+				var coordVec3 = new THREE.Vector3(x, y, z).normalize();
+				var meshNormal = new THREE.Vector3(0, 0, 1);
+
+				group.quaternion.setFromUnitVectors(meshNormal, coordVec3);
+
+				scene.add(group);
+			}
+			// 经度，纬度转换为坐标
+			function getPosition(lng, lat, radius) {
+				const theta = (90 + lng) * (Math.PI / 180);
+				const phi = (90 - lat) * (Math.PI / 180);
+				return new THREE.Vector3().setFromSpherical(
+					new THREE.Spherical(radius, phi, theta)
+				);
+			}
+			function initStar(params) {
+				/*背景星星*/
+				const particles = 20000; //星星数量
+				/*buffer做星星*/
+				let bufferGeometry = new THREE.BufferGeometry();
+
+				let positions = new Float32Array(particles * 3);
+				let colors = new Float32Array(particles * 3);
+
+				let color = new THREE.Color();
+
+				const gap = 900; // 定义星星的最近出现位置
+
+				for (let i = 0; i < positions.length; i += 3) {
+					// positions
+
+					/*-2gap < x < 2gap */
+					let x = Math.random() * gap * 2 * (Math.random() < 0.5 ? -1 : 1);
+					let y = Math.random() * gap * 2 * (Math.random() < 0.5 ? -1 : 1);
+					let z = Math.random() * gap * 2 * (Math.random() < 0.5 ? -1 : 1);
+
+					/*找出x,y,z中绝对值最大的一个数*/
+					let biggest =
+						Math.abs(x) > Math.abs(y)
+							? Math.abs(x) > Math.abs(z)
+								? "x"
+								: "z"
+							: Math.abs(y) > Math.abs(z)
+							? "y"
+							: "z";
+
+					let pos = { x, y, z };
+
+					/*如果最大值比n要小（因为要在一个距离之外才出现星星）则赋值为n（-n）*/
+					if (Math.abs(pos[biggest]) < gap)
+						pos[biggest] = pos[biggest] < 0 ? -gap : gap;
+
+					x = pos["x"];
+					y = pos["y"];
+					z = pos["z"];
+
+					positions[i] = x;
+					positions[i + 1] = y;
+					positions[i + 2] = z;
+
+					// colors
+
+					/*70%星星有颜色*/
+					let hasColor = Math.random() > 0.3;
+					let vx, vy, vz;
+
+					if (hasColor) {
+						vx = (Math.random() + 1) / 2;
+						vy = (Math.random() + 1) / 2;
+						vz = (Math.random() + 1) / 2;
+					} else {
+						vx = 1;
+						vy = 1;
+						vz = 1;
+					}
+
+					color.setRGB(vx, vy, vz);
+
+					colors[i] = color.r;
+					colors[i + 1] = color.g;
+					colors[i + 2] = color.b;
+				}
+
+				bufferGeometry.setAttribute(
+					"position",
+					new THREE.BufferAttribute(positions, 3)
+				);
+				bufferGeometry.setAttribute(
+					"color",
+					new THREE.BufferAttribute(colors, 3)
+				);
+				bufferGeometry.computeBoundingSphere();
+
+				/*星星的material*/
+				let material = new THREE.PointsMaterial({
+					size: Math.random() * 2,
+					vertexColors: THREE.VertexColors,
+				});
+				const particleSystem = new THREE.Points(bufferGeometry, material);
+				scene.add(particleSystem);
+				return particleSystem;
+			}
+		</script>
+	</body>
+</html>
