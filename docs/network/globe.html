@@ -20,7 +20,7 @@
 			const width = window.innerWidth;
 			const height = window.innerHeight;
 			const aspect = width / height;
-			var s = 500;
+			var s = 200;
 			var k = width / height; //窗口宽高比
 			let angle = 0;
 
@@ -44,7 +44,7 @@
 				scene.background = textureLoader.load("./img/starry_sky_bg.jpg");
 				//left, right, top, bottom, near, far
 				camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, -100, 1500);
-				camera.position.set(100, 100, 100); //设置相机位置
+				camera.position.set(-60, 100, -100); //设置相机位置
 				camera.lookAt(0, 0, 0); //设置相机方向(指向的场景对象)
 
 				// groupMesh.add(mesh, mesh2);
@@ -61,12 +61,14 @@
 				// earthMesh = new THREE.Mesh(earthGeo, earthMater);
 				// scene.add(earthMesh);
 
+				lineInit();
 				initLight();
-				initEarth();
-				initSatellite();
-				initClouds();
-				initTrack();
-				initCity();
+				// initEarth();
+				// initSatellite();
+				// initClouds();
+				// initTrack();
+				// initCity(116.407394, 39.904211);
+				// initCity(104.07, 30.67);
 				initStar();
 
 				const axesHelper = new THREE.AxesHelper(500);
@@ -77,6 +79,93 @@
 				renderer.setSize(width, height); //设置渲染区域尺寸
 				document.body.appendChild(renderer.domElement); //body元素中插入canvas对象
 				controls = new OrbitControls(camera, renderer.domElement); //创建控件对象
+			}
+			function getLenVcetor(v1, v2, len) {
+				let v1v2Len = v1.distanceTo(v2);
+				return v1.lerp(v2, len / v1v2Len);
+			}
+			function getVCenter(v1, v2) {
+				let v = v1.add(v2);
+				return v.divideScalar(2);
+			}
+
+			// 获取贝塞尔控制点
+			function getBezierPoint(v0, v3) {
+				let angle = (v0.angleTo(v3) * 180) / Math.PI; // 0 ~ Math.PI       // 计算向量夹角
+				let aLen = angle * 2.5,
+					hLen = angle * angle * 50;
+				let p0 = new THREE.Vector3(0, 0, 0); // 法线向量
+				let rayLine = new THREE.Ray(p0, getVCenter(v0.clone(), v3.clone())); // 顶点坐标
+				let vtop = rayLine.at(hLen / rayLine.at(1).distanceTo(p0)); // 位置
+				// 控制点坐标
+				let v1 = getLenVcetor(v0.clone(), vtop, aLen);
+				let v2 = getLenVcetor(v3.clone(), vtop, aLen);
+				return {
+					v1: v1,
+					v2: v2,
+				};
+			}
+			function drawLine(longitude, latitude, longitude2, latitude2) {
+				let geometry = new THREE.Geometry(); //声明一个几何体对象Geometry
+				let v0 = getPosition(longitude, latitude, 202);
+				let v3 = getPosition(longitude2, latitude2, 202);
+				let { v1, v2 } = getBezierPoint(v0, v3); // 三维二次贝赛尔曲线
+				let curve = new THREE.CubicBezierCurve3(v0, v1, v2, v3);
+				let curvePoints = curve.getPoints(100);
+				geometry.setFromPoints(curvePoints);
+				let material = new THREE.LineBasicMaterial({ color: 0xff7e41 });
+				let line = new THREE.Line(geometry, material);
+				// group.add(line);
+				scene.add(line);
+				// sport(curvePoints);
+			}
+
+			function lineInit() {
+				const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
+				console.log(drawLine(116.407394, 39.904211, 104.07, 30.67));
+				const points = [
+					new THREE.Vector3(-150, 10, 0),
+					new THREE.Vector3(-70, 50, 0),
+					new THREE.Vector3(70, 70, 0),
+					new THREE.Vector3(105, 10, 0),
+				];
+				console.log(7, points[0]);
+				var earthGeo = new THREE.SphereGeometry(3, 4, 4);
+				var earthMater = new THREE.MeshPhongMaterial({
+					// color: 0x3f56ff,
+					map: textureLoader.load("./img/earth.jpg"),
+				});
+				earthMesh = new THREE.Mesh(earthGeo, earthMater);
+				earthMesh.position.set(-150, 10, 0);
+				scene.add(earthMesh);
+
+				// const points = [];
+				// points.push(new THREE.Vector3(-150, 10, 0));
+				// points.push(new THREE.Vector3(-70, 10, 0));
+				// points.push(new THREE.Vector3(70, 10, 0));
+				// points.push(new THREE.Vector3(105, 10, 0));
+				const geometry = new THREE.BufferGeometry().setFromPoints(points);
+				const mesh = new THREE.Line(geometry, material);
+				scene.add(mesh);
+			}
+			function lineBezierInit() {
+				const material = new THREE.LineBasicMaterial({ color: 0x0000ff });
+				console.log(drawLine(116.407394, 39.904211, 104.07, 30.67));
+				const curve = new THREE.CubicBezierCurve3(
+					new THREE.Vector3(-150, 10, 0),
+					new THREE.Vector3(-70, 50, 0),
+					new THREE.Vector3(70, 70, 0),
+					new THREE.Vector3(105, 10, 0)
+				);
+				const points = curve.getPoints(50);
+				// const points = [];
+				// points.push(new THREE.Vector3(-150, 10, 0));
+				// points.push(new THREE.Vector3(-70, 10, 0));
+				// points.push(new THREE.Vector3(70, 10, 0));
+				// points.push(new THREE.Vector3(105, 10, 0));
+				const geometry = new THREE.BufferGeometry().setFromPoints(points);
+				const mesh = new THREE.Line(geometry, material);
+				scene.add(mesh);
 			}
 
 			function animate(params) {
@@ -174,7 +263,7 @@
 				const mesh = new THREE.Mesh(geometry, material);
 				scene.add(mesh);
 			}
-			function initCity() {
+			function initCity(lng, lat) {
 				let group = new THREE.Group();
 				const r = 8;
 				let shapePoint = new THREE.Shape();
@@ -193,7 +282,7 @@
 				geometryLine.setFromPoints(points);
 				let LineMateri = new THREE.LineBasicMaterial({ color: 0x20b2aa });
 				let line = new THREE.Line(geometryLine, LineMateri);
-				let { x, y, z } = getPosition(116.407394, 39.904211, 202);
+				let { x, y, z } = getPosition(lng, lat, 202);
 				group.position.set(x, y, z);
 
 				var plane = new THREE.PlaneGeometry(20, 60);
@@ -209,11 +298,6 @@
 				});
 				var mesh = new THREE.Mesh(plane, material);
 				var mesh2 = mesh.clone().rotateY(Math.PI / 2);
-				// mesh.position.set(x, y, z);
-				// mesh2.position.set(x, y, z);
-				// var groupMesh = new THREE.Group();
-				scene.add(mesh);
-				// scene.add(mesh2);
 
 				group.add(line);
 				group.add(mesh);
