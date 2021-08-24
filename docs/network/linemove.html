@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style>
+			body {
+				margin: 0;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+		<script type="module">
+			import * as THREE from "../build/three.module.js";
+			import { OrbitControls } from "./jsm/controls/OrbitControls.js";
+
+			const width = window.innerWidth;
+			const height = window.innerHeight;
+			const aspect = width / height;
+			var s = 4;
+			var k = width / height; //窗口宽高比
+			let angle = 0;
+			let t = 0.01;
+			let scene,
+				camera,
+				renderer,
+				controls,
+				earthMesh,
+				satelliteMesh,
+				textureLoader,
+				light,
+				mesh,
+				cloudsMesh;
+			init();
+			animate();
+			point();
+			function init(params) {
+				textureLoader = new THREE.TextureLoader();
+
+				scene = new THREE.Scene();
+
+				//left, right, top, bottom, near, far
+				camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, -100, 1500);
+				camera.position.set(100, 200, 100); //设置相机位置
+				camera.lookAt(0, 0, 0); //设置相机方向(指向的场景对象)
+
+				const axesHelper = new THREE.AxesHelper(500);
+				scene.add(axesHelper);
+
+				const geometry = new THREE.BoxBufferGeometry(0.1, 0.1, 0.1);
+				const material = new THREE.MeshBasicMaterial({
+					color: 0xf00000,
+				});
+				mesh = new THREE.Mesh(geometry, material);
+				scene.add(mesh);
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor(0xb9d3ff, 1); //设置背景颜色
+				renderer.setSize(width, height); //设置渲染区域尺寸
+				document.body.appendChild(renderer.domElement); //body元素中插入canvas对象
+				controls = new OrbitControls(camera, renderer.domElement); //创建控件对象
+			}
+			function point() {
+				const initialPoints = [
+					{ x: 1, y: 1, z: -1 },
+					{ x: 1, y: 0, z: 1 },
+					{ x: -1, y: 0, z: 1 },
+					{ x: -1, y: 0, z: -1 },
+				];
+				const addCube = (pos) => {
+					const geometry = new THREE.BoxBufferGeometry(0.1, 0.1, 0.1);
+					const material = new THREE.MeshBasicMaterial(0xffffff);
+					const cube = new THREE.Mesh(geometry, material);
+					cube.position.copy(pos);
+					console.log(9, cube);
+					scene.add(cube);
+					return cube;
+				};
+
+				const cubeList = initialPoints.map((pos) => {
+					return addCube(pos);
+				});
+				console.log(6, cubeList);
+				const curve = new THREE.CatmullRomCurve3(
+					cubeList.map((cube) => cube.position) // 直接绑定方块的position以便后续用方块调整曲线
+				);
+				curve.curveType = "chordal"; // 曲线类型
+				curve.closed = true; // 曲线是否闭合
+
+				const points = curve.getPoints(50); // 50等分获取曲线点数组
+				const material = new THREE.LineBasicMaterial({
+					color: 0x0000ff,
+				});
+				const geometry = new THREE.BufferGeometry().setFromPoints(points);
+				const line = new THREE.LineLoop(geometry, material);
+				scene.add(line);
+				move();
+
+				function move() {
+					console.log(4, t);
+					if (t >= 1) t = 0.01;
+					console.log(5, t);
+
+					const position = curve.getPointAt(t);
+					mesh.position.copy(position);
+					const tangent = curve.getTangentAt(t);
+					const lookAtVec = tangent.add(position);
+					mesh.lookAt(lookAtVec);
+				}
+			}
+
+			function animate() {
+				t += 0.01;
+				point();
+
+				controls.update();
+
+				renderer.render(scene, camera);
+				requestAnimationFrame(animate);
+			}
+		</script>
+	</body>
+</html>
